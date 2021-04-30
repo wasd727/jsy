@@ -1,0 +1,509 @@
+1.结构体设计
+ struct data
+{
+    int num[10001];
+    float num1[10001];
+}p[10001];
+
+2.主函数
+    在主函数中，我们主要针对一些必要要求进行了判断，并依据此在其各个子函数中进行处理。对于运算符的选择，我们依据学生的要求进行设计，通过设定字符串数组来完成运算符的选择。
+int main()
+{
+	int NUM,Num,Max;
+	int parentheses,print_yes_no,decimal;
+	char op_operator[5];
+	cout<<"----------------------------------------------------------\n";
+	cout<<"请输入共有多少组运算表达式：";
+	cin>>NUM;
+	cout<<"----------------------------------------------------------\n";
+	cout<<"请输入运算数的最大值，以保证所有计算数据都在该数字以内: ";
+	cin>>Max;
+	cout<<"----------------------------------------------------------\n";
+	cout<<"请输入有无括号（1代表有括号、0代表无括号）: ";
+	cin>>parentheses;
+	cout<<"----------------------------------------------------------\n";
+	cout<<"请输入是否将结果存到文件中（1代表存放、0代表不存放）: ";
+	cin>>print_yes_no;
+	cout<<"----------------------------------------------------------\n";
+	cout<<"请选择输入是小数还是整数（1代表整数、0代表小数）：";
+    cin>>decimal;
+    cout<<"----------------------------------------------------------\n";
+    cout<<"请选择输入的运算符：";
+	cin>>op_operator;
+	cout<<"----------------------------------------------------------\n";
+    Num=-1;
+    while(1)
+    {
+        if(Num<2||Num>8)
+            Num=int(rand()%10);//定义每个表达式有多少个参与运算的实数
+        else
+            break;
+    }
+	if(parentheses==1)
+        Have_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal);
+    else if(parentheses==0)
+        No_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal);
+	system("pause");
+	return 0;
+}
+
+3.括号处理
+对于表达式中是否含有括号的问题，我们分为两部分：有括号形式和无括号形式。在程序中，我们利用了随机数生成函数进行处理。
+（1）无括号表达式
+void No_parentheses(int NUM,int Max,int Num,int print_yes_no,char op_operator[],int decimal)//无括号的运算形式
+{
+    int i,j,len;
+    int op;
+    len=strlen(op_operator);
+    ofstream outfile;
+    outfile.open("a.txt");
+    for(i=0;i<NUM;i++)
+    {
+        for(j=0;j<Num;j++)
+        {
+            op=int(rand()%len);
+            if(decimal==1)
+            {
+                p[i].num[j]=rand()%Max+1;
+                p[i].num[j+1]=rand()%Max+1;
+            }
+            if(decimal==0)
+            {
+                p[i].num1[j]=rand()%Max*0.3;
+                p[i].num1[j+1]=rand()%Max*0.7;
+            }
+            if(j<Num-1)
+            {
+                if(decimal==1)
+                {
+                    cout<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                    if(print_yes_no==1)
+                         outfile<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                }
+                else
+                {
+                    cout<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                    if(print_yes_no==1)
+                        outfile<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                }
+            }
+            if(j==Num-1)
+            {
+                if(decimal==1)
+                {
+                    cout<<p[i].num[j]<<" ";
+                    if(print_yes_no==1)
+                        outfile<<p[i].num[j]<<" ";
+                }
+                else
+                {
+                    cout<<setprecision(1)<<std::fixed<<p[i].num1[j];
+                    if(print_yes_no==1)
+                        outfile<<setprecision(1)<<std::fixed<<p[i].num1[j];
+                }
+            }
+        }
+        cout<<"= "<<"\n";
+        if(print_yes_no==1)
+            outfile<<"= "<<"\n";
+    }
+    outfile.close();
+}
+
+
+
+
+
+（1）有括号形式的表达式
+void Have_parentheses(int NUM,int Max,int Num,int print_yes_no,char op_operator[],int decimal)//带括号的运算
+{
+    int flag1=0,flag2=0;
+    int k1,k2;
+    int op;
+    int i,j,len;
+    len=strlen(op_operator);
+    ofstream outfile;
+    outfile.open("a.txt");
+    for(i=0;i<NUM;i++)
+    {
+        k1=-1;
+        k2=-1;
+        while(1)
+        {
+            if(k1>k2||k2-k1<2||k2>Num)
+            {
+                k1=int(rand()%(Num-1));
+                k2=int(rand()%(Num-1));
+            }
+            else
+                break;
+        }
+        for(j=0;j<Num;j++)
+        {
+            op=int(rand()%len);
+            if(decimal==1)
+            {
+                p[i].num[j]=rand()%Max+1;
+                p[i].num[j+1]=rand()%Max+1;
+            }
+            if(decimal==0)
+            {
+                p[i].num1[j]=rand()%Max*0.3;
+                p[i].num1[j+1]=rand()%Max*0.7;
+            }
+            if(j<Num-1)
+            {
+                if(j==k1)
+                {
+                    if(decimal==1)
+                    {
+                        cout<<"("<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                        flag1=1;
+                        if(print_yes_no==1)
+                            outfile<<"("<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                    }
+                    else
+                    {
+                        cout<<"("<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                        flag1=1;
+                        if(print_yes_no==1)
+                            outfile<<"("<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                    }
+                }
+                else if(j==k2)
+                {
+                    if(decimal==1)
+                    {
+                        cout<<p[i].num[j]<<")"<<" "<<op_operator[op]<<" ";
+                        flag2=1;
+                        if(print_yes_no==1)
+                            outfile<<p[i].num[j]<<")"<<" "<<op_operator[op]<<" ";
+                    }
+                    else
+                    {
+                        cout<<setprecision(1)<<std::fixed<<p[i].num1[j]<<")"<<" "<<op_operator[op]<<" ";
+                        flag2=1;
+                        if(print_yes_no==1)
+                            outfile<<setprecision(1)<<std::fixed<<p[i].num1[j]<<")"<<" "<<op_operator[op]<<" ";
+                    }
+                }
+                else
+                {
+                    if(decimal==1)
+                    {
+                        cout<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                        if(print_yes_no==1)
+                            outfile<<p[i].num[j]<<" "<<op_operator[op]<<" ";
+                    }
+                    else
+                    {
+                        cout<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                        if(print_yes_no==1)
+                            outfile<<setprecision(1)<<std::fixed<<p[i].num1[j]<<" "<<op_operator[op]<<" ";
+                    }
+                }
+            }
+            else
+            {
+                if(flag1==1&&flag2==0)
+                {
+                    if(decimal==1)
+                    {
+                        cout<<p[i].num[j]<<")"<<" ";
+                        if(print_yes_no==1)
+                            outfile<<p[i].num[j]<<")"<<" ";
+                    }
+                    else
+                    {
+                        cout<<setprecision(1)<<std::fixed<<p[i].num1[j]<<')';
+                        if(print_yes_no==1)
+                            outfile<<setprecision(1)<<std::fixed<<p[i].num1[j]<<')';
+                    }
+                }
+                else
+                {
+                    if(decimal==1)
+                    {
+                        cout<<p[i].num[j]<<" ";
+                        if(print_yes_no==1)
+                            outfile<<p[i].num[j]<<" ";
+                    }
+                    else
+                    {
+                        cout<<setprecision(1)<<std::fixed<<p[i].num1[j];
+                        if(print_yes_no==1)
+                            outfile<<setprecision(1)<<std::fixed<<p[i].num1[j];
+                    }
+                }
+            }
+        }
+       cout<<"= "<<"\n";
+       if(print_yes_no==1)
+            outfile<<"= "<<"\n";
+    }
+    outfile.close();
+}
+4.界面设计
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<form method="post">
+			运算表达式组数：<input type='text' id="NUM" size="15" maxlength="10"/><br /><br />
+			运算数据最大值：<input type='text' id="Max" size="15" maxlength="10"/><br /><br />
+			表达式有无括号：
+			<input type="radio"  name="gender1" value="有括号"/>有括号
+			<input type="radio"  name="gender1" value="无括号"/>无括号
+			<br />
+			<br />
+			数据的数据类型：
+			<select id="datatype">
+				<option value=0>整数</option>
+				<option value=1>小数</option>
+			</select>
+			<br />
+			<br />
+			运算操作符：
+			<input type="checkbox" name="gender2" value="+"/>+
+			<input type="checkbox" name="gender2" value="-"/>-
+			<input type="checkbox" name="gender2" value="*"/>*
+			<input type="checkbox" name="gender2" value="/"/>/
+		</form>
+		<textarea name="textContent" cols="80" rows="15" id="textContent"></textarea> <br />
+		<form>
+			<input type="button" id="Button" value="Done!">
+		</form>
+		<script>
+			window.onload = init;
+			var p=[];
+			function Have_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal)
+			{
+    			var flag1=0;
+    			var flag2=0;
+    			var k1;
+    			var k2;
+    			var op;
+    			var i;
+    			var j;
+    			var len;
+    			len=op_operator.length;
+    			var s="";
+    			p=new Array();
+    			for(i=0;i<NUM;i++)
+    			{
+       			 	k1=-1;
+        			k2=-1;
+        			while(1)
+        			{
+            			if(k1>k2||k2-k1<2||k2>Num)
+            			{
+                			k1=Math.floor(Math.random()*(Num-1));
+                			k2=Math.floor(Math.random()*(Num-1));
+            			}
+            			else
+                			break;
+        			}
+        			var num=new Array();
+        			for(j=0;j<Num+1;j++){
+        			num.push(j);
+	    			}
+        			p.push(num);
+        			for(j=0;j<Num;j++)
+       			 	{
+            			op=Math.random()*len;
+            			if(decimal==0){
+            			p[i][j]=Math.floor(Math.random()*Max+1);
+            			p[i][j+1]=Math.floor(Math.random()*Max+1);
+						}	
+						else{
+            			p[i][j]=(Math.random()*Max+1).toFixed(2);
+            			p[i][j+1]=(Math.random()*Max+1).toFixed(2);
+						}	
+            			if(j<Num-1)
+            			{
+            			    if(j==k1)
+                			{
+					 			flag1=1;
+								s+="(";
+								s+=p[i][j].toString();
+								s+=" ";
+								var num=Math.floor(Math.random()*len);
+								s+=op_operator[num];
+								s+=" ";
+                			}
+                			else if(j==k2)
+                			{
+								flag2=1;
+								s+=p[i][j].toString();
+								s+=")";
+								s+=" ";
+								var num=Math.floor(Math.random()*len);
+								s+=op_operator[num];
+								s+=" ";
+                			}
+                			else
+                			{
+								var num=Math.floor(Math.random()*len);
+                    			s+=p[i][j].toString();s+=" ";s+=op_operator[num];s+=" ";
+                			}
+           				}
+            			else
+           				{
+                			if(flag1==1&&flag2==0)
+                			{
+                    			s+=p[i][j].toString();s+=")";s+=" ";
+                			}
+                			else
+                			{
+                    			s+=p[i][j].toString();s+=" ";
+                			}
+            			} 
+            			console.log(s);
+        			}
+        		s+="=  \n ";
+    			}
+    			var output = document.getElementById("textContent");
+				output.value=s;
+		    }
+
+			function No_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal)
+			{
+				var flag1=0;
+    			var flag2=0;
+    			var k1;
+    			var k2;
+    			var op;
+    			var i;
+    			var j;
+    			var len;
+    			len=op_operator.length;
+    			var s="";
+    			p=new Array();
+    			for(i=0;i<NUM;i++)
+    			{
+        			k1=-1;
+        			k2=-1;
+        			while(1)
+        			{
+            			if(k1>k2||k2-k1<2||k2>Num)
+            			{
+            	    		k1=Math.random()*5;
+            	    		k2=Math.random()*5;
+            			}
+            			else
+            	    		break;
+        			}
+        			var num=new Array();
+        			for(j=0;j<Num+1;j++){
+        				num.push(j);
+	   	 			}
+        			p.push(num);
+  
+        			for(j=0;j<Num;j++)
+        			{
+            			op=Math.random()*len;
+           				if(decimal==0){
+            				p[i][j]=Math.floor(Math.random()*Max+1);
+            				p[i][j+1]=Math.floor(Math.random()*Max+1);
+						}	
+						else{
+            				p[i][j]=(Math.random()*Max+1).toFixed(2);
+            				p[i][j+1]=(Math.random()*Max+1).toFixed(2);
+						}	
+            			if(j<Num-1)
+            			{
+                			if(j==k1)
+                			{
+								s+=p[i][j].toString();
+								s+=" ";
+								var num=Math.floor(Math.random()*len);
+								s+=op_operator[num];
+								s+=" ";
+                			}	
+                			else if(j==k2)
+                			{	
+								s+=p[i][j].toString();
+								s+=" ";
+								var num=Math.floor(Math.random()*len);
+								s+=op_operator[num];
+								s+=" ";
+                			}
+                			else
+                			{
+								var num=Math.floor(Math.random()*len);
+                    			s+=p[i][j].toString();s+=" ";s+=op_operator[num];s+=" ";
+                			}	
+            			}
+            			else
+            			{
+                			if(flag1==1&&flag2==0)
+                			{
+                    			s+=p[i][j].toString();s+=" ";
+                			}
+                			else
+                			{
+                    			s+=p[i][j].toString();s+=" ";
+                			}	
+            			} 
+            			console.log(s);
+        			}
+        			s+="=  \n ";
+    			}
+    			var output = document.getElementById("textContent");
+				output.value=s;
+			}
+
+			function handleButton(){
+				var input1=document.getElementById("NUM");
+				var input2=document.getElementById("Max");
+				var input3=document.getElementsByName("gender1");
+				var select =document.getElementById("datatype");
+				var value = select.value;
+				var input4 = document.getElementsByName("gender2");
+	
+				var NUM,Num=-1,Max,parentheses,print_yes_no,decimal;
+				var op_operator=[];
+				NUM=input1.value;
+				while(1)
+    			{
+        			if(Num<2||Num>8)
+            			Num=Math.floor(Math.random()*10);		//定义每个表达式有多少个参与运算的实数
+        			else
+            			break;
+    			}
+    			Max=input2.value;
+    			parentheses=-1;
+    			if(input3[0].checked)
+    				parentheses=1;
+    			if(input3[1].checked)
+    				parentheses=0;
+    				print_yes_no=0;
+    			if(value==1)
+    				decimal=1;
+    			else
+    				decimal=0;
+    			if(input4[0].checked)
+    				op_operator.push('+');
+    			if(input4[1].checked)
+    				op_operator.push('-');
+    			if(input4[2].checked)
+    				op_operator.push('*');
+    			if(input4[3].checked)
+    				op_operator.push('/');
+				if(parentheses==1){	//有括号
+        			Have_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal);
+			}
+    		else if(parentheses==0){//无括号
+        		No_parentheses(NUM,Max,Num,print_yes_no,op_operator,decimal);
+				}
+			}
+
+			function init() {
+				var Button = document.getElementById("Button");
+				Button.onclick = handleButton;
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+<html>
